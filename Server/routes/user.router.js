@@ -5,7 +5,7 @@ import { authUser } from "../middlewares/Auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/hi", (req, res) => {
+router.get("/", (req, res) => {
     res.send("App is running or hi")
 })
 

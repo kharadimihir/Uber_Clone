@@ -8,11 +8,17 @@ import BlackLisingTokens from "../models/blacklistingtokens.model.js";
 const registerUser = async (req, res, next) => {
     const errors = validationResult(req);
 
-    if (errors.length === 0) {
+    if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array()})
     }
 
     const { fullName, email, password } = req.body;
+
+    const isUserAlreadyExist = await User.findOne({ email });
+
+    if (isUserAlreadyExist) {
+        return res.status(400).json({ message: "User already exist "})
+    }
     const hashPassword = await User.hashPassword(password);
 
     const user = await createUser({
@@ -32,7 +38,7 @@ const registerUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
     const errors = validationResult(req);
 
-    if (errors.length === 0) {
+    if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array()})
     }
 
@@ -65,7 +71,7 @@ const getUserProfile = async (req, res, next) => {
 const logoutUser = async (req, res, next) => {
     res.clearCookie("token")
 
-    const token = req.cookies.token || req.headers.authorization.split(" ")[1]
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1]
     await BlackLisingTokens.create({token})
 
     return res.status(200).json({ message: "Logout successfully"})
