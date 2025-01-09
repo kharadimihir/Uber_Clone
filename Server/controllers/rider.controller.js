@@ -83,10 +83,26 @@ const getRiderProfile = async (req, res, next) => {
 const logoutRider = async (req, res, next) => {
     res.clearCookie("token")
 
-    const token = req.cookies.token || req.headers.authorization?.split(" ")[1]
-    await BlackLisingTokens.create({token})
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
 
-    return res.status(200).json({ message: "Logout successfully" })
+    if (!token) {
+        return res.status(400).json({ message: 'Token is required'});
+    }
+
+    try {
+        const existingToken = await BlackLisingTokens.findOne({ token });
+    
+        if (existingToken) {
+            return res.status(200).json({ message: 'Token is already blacklisted' });
+        }
+    
+        await BlackLisingTokens.create({token})
+    
+        return res.status(200).json({ message: "Logout successfully" })
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
 }
 
 

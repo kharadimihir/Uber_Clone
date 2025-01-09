@@ -53,7 +53,7 @@ const loginUser = async (req, res, next) => {
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
-        return res.status(401).josn({ message: "Invalid email or password"})
+        return res.status(401).jsonn({ message: "Invalid email or password"})
     }
 
     const token = user.generateAuthToken()
